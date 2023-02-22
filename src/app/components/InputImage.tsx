@@ -5,7 +5,7 @@ import { useMouse } from '../hooks/useMouse';
 // import './main.scss';
 
 type InputImageParams = {
-	inputImage: string | undefined;
+	inputImage: string | ArrayBuffer | null | undefined;
 	handleInputImage: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 

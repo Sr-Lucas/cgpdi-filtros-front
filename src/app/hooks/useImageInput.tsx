@@ -1,10 +1,14 @@
 import { useState } from 'react';
 
 import { upload } from '@/modules/upload';
+import { atom, useAtom } from 'jotai';
+
+const inputImageAtom = atom<string | ArrayBuffer | null | undefined>(null);
+const fileUploadNameAtom = atom<string>('');
 
 export const useImageInput = () => {
-	const [inputImage, setInputImage] = useState<any>(null);
-	const [fileUploadName, setFileUploadName] = useState<string>('');
+	const [inputImage, setInputImage] = useAtom(inputImageAtom);
+	const [fileUploadName, setFileUploadName] = useAtom(fileUploadNameAtom);
 
 	const handleInputImage = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length !== 0) {

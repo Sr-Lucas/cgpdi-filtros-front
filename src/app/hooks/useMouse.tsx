@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-export const useMouse = (inputImage: string | undefined, ref: React.RefObject<HTMLDivElement>) => {
+export const useMouse = (inputImage: string | ArrayBuffer | null | undefined, ref: React.RefObject<HTMLDivElement>) => {
 	const [mousePos, setMousePos] = useState({
 		x: 0,
 		y: 0,
@@ -18,7 +18,7 @@ export const useMouse = (inputImage: string | undefined, ref: React.RefObject<HT
 		if (!inputImage) return 0;
 
 		var img = new Image();
-		img.src = inputImage;
+		img.src = inputImage as string;
 		img.width = 256;
 		img.height = 256;
 		var canvas = document.createElement('canvas');
