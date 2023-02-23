@@ -1,8 +1,12 @@
 type FilterButtonProps = {
 	filterName: string;
-	handleFilter: () => void;
+	handleFilter?: any;
 };
 
 export const FilterButton = ({ filterName, handleFilter }: FilterButtonProps) => {
-	return <button onClick={() => handleFilter()}>{filterName}</button>;
+	return (
+		<button className="filter-btn" onClick={() => handleFilter && handleFilter({})}>
+			{filterName}
+		</button>
+	);
 };

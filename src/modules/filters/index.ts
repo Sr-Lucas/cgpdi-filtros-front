@@ -3,8 +3,8 @@ import { api } from '@/services/api';
 import { LogarithmicFilter } from './logarithmic-filter';
 import { NegativeFilter } from './negative-filter';
 import { InverseLogFilter } from './inverselogaritmic-filter'; 
-import { nthPowerFilter } from './nth-power-filter';
-import { nthRootFilter } from './nth-root-filter';
+import { nthPowerFilter as NthPowerFilter } from './nth-power-filter';
+import { NthRootFilter as NthRootFilter } from './nth-root-filter';
 import { HorizontalMirrorFilter } from './horizontal-mirror-filter';
 import { verticalMirrorFilter } from './verticalmirror-filter';
 import { rotation90ClockwiseFilter } from './rotation90clockwise-filter';
@@ -31,8 +31,8 @@ export const filters = {
   negativeFilter: new NegativeFilter(api),
   logarithmicFilter: new LogarithmicFilter(api),
   inverselogFilter: new InverseLogFilter(api),
-  nthpowerFilter: new nthPowerFilter(api),
-  nthRootFilter: new nthRootFilter(api),
+  nthPowerFilter: new NthPowerFilter(api),
+  nthRootFilter: new NthRootFilter(api),
   HorizontalMirrorFilter: new HorizontalMirrorFilter(api),
   verticalMirrorFilter: new verticalMirrorFilter(api),
   rotation90ClockwiseFilter: new rotation90ClockwiseFilter(api),

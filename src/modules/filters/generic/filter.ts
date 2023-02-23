@@ -8,9 +8,10 @@ export interface IFilter {
 export abstract class Filter {
   constructor(protected readonly api: AxiosInstance) {}
 
-  protected async applyFilter(path: string, { filename }: ApplyFilterParams): Promise<ApplyFilterResponse> {
+  protected async applyFilter(path: string, { filename, ...rest }: ApplyFilterParams): Promise<ApplyFilterResponse> {
     const response = await this.api.post(path, {
       filename,
+      ...rest
     });
     
     if (response.status === 200) {

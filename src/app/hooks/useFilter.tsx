@@ -1,6 +1,8 @@
 import { filters as Filters } from '@/modules/filters';
 import { IFilter } from '@/modules/filters/generic/filter';
 import { atom, useAtom } from 'jotai';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 type UseImageFilterProps = {
 	fileUploadName: string;
@@ -8,8 +10,33 @@ type UseImageFilterProps = {
 
 const filteredURLAtom = atom<string>('');
 
+type InputField = {
+	label: string;
+	type: string;
+	id: string;
+	name: string;
+	required: boolean;
+};
+
+type FilterType = {
+	name: string;
+	method: (data: HandleParams) => void;
+	inputFields: InputField[];
+};
+
+type HandleParams = {
+	[key: string]: any;
+};
+
 export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
+	const [isModalInputOpen, setIsModalInputOpen] = useState(false);
 	const [filteredFileURL, setFilteredFileURL] = useAtom(filteredURLAtom);
+
+	const { register, handleSubmit } = useForm({});
+
+	const onSubmit = async (filter: IFilter) => {
+		await handleFilter(filter);
+	};
 
 	const handleFilter = async (filter: IFilter) => {
 		if (!fileUploadName) return;
@@ -33,12 +60,14 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		handleFilter(Filters.inverselogFilter);
 	};
 
-	const handlenthpowerFilter = async () => {
-		handleFilter(Filters.nthpowerFilter);
+	const handleNthPowerFilter = async (data: HandleParams) => {
+		Filters.nthPowerFilter.gamma = Number(data.gamma);
+		onSubmit(Filters.nthPowerFilter);
 	};
 
-	const handlenthRootFilter = async () => {
-		handleFilter(Filters.nthRootFilter);
+	const handlenthRootFilter = async (data: HandleParams) => {
+		Filters.nthRootFilter.gamma = Number(data.gamma);
+		onSubmit(Filters.nthRootFilter);
 	};
 
 	const handleHorizontalMirrorFilter = async () => {
@@ -89,8 +118,9 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		handleFilter(Filters.birAmpliation);
 	};
 
-	const handlekNearestNeighbour = async () => {
-		handleFilter(Filters.kNearestNeighbour);
+	const handlekNearestNeighbour = async (data: HandleParams) => {
+		Filters.kNearestNeighbour.k = Number(data.k);
+		onSubmit(Filters.kNearestNeighbour);
 	};
 
 	const handlemakeHistogram = async () => {
@@ -120,111 +150,164 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 	const handlesobel = async () => {
 		handleFilter(Filters.SobelFilter);
 	};
-	const filters = [
+	const filters: FilterType[] = [
 		{
 			name: 'Negativo',
 			method: handleNegativeFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Logarítmico',
 			method: handleLogarithmicFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Logarítmico Inverso',
 			method: handleInverseLogFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Filtro da Potência',
-			method: handlenthpowerFilter,
+			method: handleNthPowerFilter,
+			inputFields: [
+				{
+					label: 'Gamma',
+					type: 'number',
+					id: 'gamma',
+					name: 'gamma',
+					required: true,
+				},
+			],
 		},
 		{
 			name: 'Filtro da Raiz',
 			method: handlenthRootFilter,
+			inputFields: [
+				{
+					label: 'Gamma',
+					type: 'number',
+					id: 'gamma',
+					name: 'gamma',
+					required: true,
+				},
+			],
 		},
 		{
 			name: 'Espelhamento Horizontal',
 			method: handleHorizontalMirrorFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Espelhamento Vertical',
 			method: handleverticalMirrorFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Rotação 90º graus sentido horario',
 			method: handlerotation90ClockwiseFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Rotação 90º AntiHorario',
 			method: handlerotation90AnticlockwiseFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Compressão de Imagem',
 			method: handleCompression,
+			inputFields: [],
 		},
 		{
 			name: 'Expansão de Imagem',
 			method: handleExpansion,
+			inputFields: [],
 		},
 		{
 			name: 'Filtro "Máx"',
 			method: handlemaxFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Filtro "Mín"',
 			method: handleminFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Filtro da Moda',
 			method: handlemodaFilter,
+			inputFields: [],
 		},
 		{
 			name: 'PseudoMediana',
 			method: handlepseudoMedianaFilter,
+			inputFields: [],
 		},
 		{
 			name: 'Nearest Neighboor Resampling',
 			method: handlennrAmpliation,
+			inputFields: [],
 		},
 		{
 			name: 'Bilinear Interpolation Resampling',
 			method: handlebirAmpliation,
+			inputFields: [],
 		},
 		{
 			name: 'K Vizinhos',
 			method: handlekNearestNeighbour,
+			inputFields: [
+				{
+					label: 'K',
+					type: 'number',
+					id: 'k',
+					name: 'k',
+					required: true,
+				},
+			],
 		},
 		{
 			name: 'Histograma',
 			method: handlemakeHistogram,
+			inputFields: [],
 		},
 		{
 			name: 'Equalização de imagem',
 			method: handleequalizeImage,
+			inputFields: [],
 		},
 		{
 			name: 'Soma de imagens',
 			method: handlesumImages,
+			inputFields: [],
 		},
 		{
 			name: 'Filtro Laplaciano',
 			method: handlelaplaciano,
+			inputFields: [],
 		},
 		{
 			name: 'Filtro HighBoost',
 			method: handlehightboost,
+			inputFields: [],
 		},
 		{
 			name: 'Filtro Prewitt',
 			method: handleprewitt,
+			inputFields: [],
 		},
 		{
 			name: 'Filtro Sobel',
 			method: handlesobel,
+			inputFields: [],
 		},
 	];
 
 	return {
 		filters,
 		filteredFileURL,
+		isModalInputOpen,
+		setIsModalInputOpen,
+		handleSubmit,
+		register,
 	};
 };
