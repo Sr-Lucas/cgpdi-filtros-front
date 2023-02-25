@@ -11,7 +11,7 @@ import { ModalInputs } from './components/ModalInputs';
 
 export default function Home() {
 	const { fileUploadName, inputImage, handleInputImage } = useImageInput();
-	const { filteredFileURL, filters, isModalInputOpen, setIsModalInputOpen, handleSubmit, register } = useImageFilter({ fileUploadName });
+	const { filteredFileURL, filters, modalOpen, setModalOpen } = useImageFilter({ fileUploadName });
 
 	return (
 		<main id="main-container">
@@ -23,15 +23,14 @@ export default function Home() {
 							<FilterButton
 								key={filter.name}
 								filterName={filter.name}
-								handleFilter={filter.inputFields.length > 0 ? () => setIsModalInputOpen(true) : filter.method}
+								handleFilter={filter.inputFields.length > 0 ? () => setModalOpen(filter.modalId ?? null) : filter.method}
 							/>
 							{filter.inputFields.length > 0 && (
 								<ModalInputs
 									inputFields={filter.inputFields}
-									isOpen={isModalInputOpen}
-									onClose={() => setIsModalInputOpen(false)}
-									onSend={handleSubmit(filter.method)}
-									register={register}
+									isOpen={modalOpen === filter.modalId}
+									onClose={() => setModalOpen(null)}
+									onSend={filter.method}
 								/>
 							)}
 						</>

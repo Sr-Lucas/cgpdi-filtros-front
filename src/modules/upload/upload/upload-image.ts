@@ -12,6 +12,7 @@ export class UploadImage {
   constructor(private readonly api: AxiosInstance) {}
 
   public async single({ image }: UploadImageParams): Promise<string> {
+    console.log(image)
     const formData = new FormData();
     formData.append('file', image, image.name);
 

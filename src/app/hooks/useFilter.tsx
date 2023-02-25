@@ -1,5 +1,6 @@
 import { filters as Filters } from '@/modules/filters';
 import { IFilter } from '@/modules/filters/generic/filter';
+import { upload } from '@/modules/upload';
 import { atom, useAtom } from 'jotai';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -22,17 +23,25 @@ type FilterType = {
 	name: string;
 	method: (data: HandleParams) => void;
 	inputFields: InputField[];
+	modalId?: number;
 };
 
 type HandleParams = {
 	[key: string]: any;
 };
 
-export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
-	const [isModalInputOpen, setIsModalInputOpen] = useState(false);
-	const [filteredFileURL, setFilteredFileURL] = useAtom(filteredURLAtom);
+enum ModalEnum {
+	handleNthPowerFilter = 0,
+	handleNthRootFilter = 1,
+	handleCompression = 2,
+	handleExpansion = 3,
+	handleSumImage = 4,
+	handlekNearestNeighbour = 5,
+}
 
-	const { register, handleSubmit } = useForm({});
+export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
+	const [modalOpen, setModalOpen] = useState<number | null>(null);
+	const [filteredFileURL, setFilteredFileURL] = useAtom(filteredURLAtom);
 
 	const onSubmit = async (filter: IFilter) => {
 		await handleFilter(filter);
@@ -46,6 +55,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		} = await filter.apply({ filename: fileUploadName });
 
 		setFilteredFileURL(url);
+		setModalOpen(null);
 	};
 
 	const handleNegativeFilter = async () => {
@@ -86,12 +96,16 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		handleFilter(Filters.rotation90AnticlockwiseFilter);
 	};
 
-	const handleCompression = async () => {
-		handleFilter(Filters.compression);
+	const handleCompression = async (data: HandleParams) => {
+		Filters.compression.a = Number(data.a);
+		Filters.compression.b = Number(data.b);
+		onSubmit(Filters.compression);
 	};
 
-	const handleExpansion = async () => {
-		handleFilter(Filters.expansion);
+	const handleExpansion = async (data: HandleParams) => {
+		Filters.expansion.a = Number(data.a);
+		Filters.expansion.b = Number(data.b);
+		onSubmit(Filters.expansion);
 	};
 
 	const handlemaxFilter = async () => {
@@ -131,8 +145,20 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		handleFilter(Filters.equalizeImage);
 	};
 
-	const handlesumImages = async () => {
-		handleFilter(Filters.sumImages);
+	const handlesumImages = async (data: HandleParams) => {
+		if (!data.filename2[0]) {
+			return alert('Selecione uma imagem para somar');
+		}
+
+		Filters.sumImages.filename1 = fileUploadName;
+		Filters.sumImages.filename2 = await upload.uploadImage.single({ image: data.filename2[0] });
+
+		const {
+			data: { url },
+		} = await Filters.sumImages.apply();
+
+		setFilteredFileURL(url);
+		setModalOpen(null);
 	};
 
 	const handlelaplaciano = async () => {
@@ -169,6 +195,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		{
 			name: 'Filtro da Potência',
 			method: handleNthPowerFilter,
+			modalId: ModalEnum.handleNthPowerFilter,
 			inputFields: [
 				{
 					label: 'Gamma',
@@ -182,6 +209,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		{
 			name: 'Filtro da Raiz',
 			method: handlenthRootFilter,
+			modalId: ModalEnum.handleNthRootFilter,
 			inputFields: [
 				{
 					label: 'Gamma',
@@ -215,12 +243,44 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		{
 			name: 'Compressão de Imagem',
 			method: handleCompression,
-			inputFields: [],
+			modalId: ModalEnum.handleCompression,
+			inputFields: [
+				{
+					label: 'A',
+					type: 'number',
+					id: 'a',
+					name: 'a',
+					required: true,
+				},
+				{
+					label: 'B',
+					type: 'number',
+					id: 'b',
+					name: 'b',
+					required: true,
+				},
+			],
 		},
 		{
 			name: 'Expansão de Imagem',
 			method: handleExpansion,
-			inputFields: [],
+			modalId: ModalEnum.handleExpansion,
+			inputFields: [
+				{
+					label: 'A',
+					type: 'number',
+					id: 'a',
+					name: 'a',
+					required: true,
+				},
+				{
+					label: 'B',
+					type: 'number',
+					id: 'b',
+					name: 'b',
+					required: true,
+				},
+			],
 		},
 		{
 			name: 'Filtro "Máx"',
@@ -255,6 +315,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		{
 			name: 'K Vizinhos',
 			method: handlekNearestNeighbour,
+			modalId: ModalEnum.handlekNearestNeighbour,
 			inputFields: [
 				{
 					label: 'K',
@@ -278,7 +339,16 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		{
 			name: 'Soma de imagens',
 			method: handlesumImages,
-			inputFields: [],
+			modalId: ModalEnum.handleSumImage,
+			inputFields: [
+				{
+					id: 'filename2',
+					name: 'filename2',
+					type: 'file',
+					required: true,
+					label: 'Imagem 2',
+				},
+			],
 		},
 		{
 			name: 'Filtro Laplaciano',
@@ -305,9 +375,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 	return {
 		filters,
 		filteredFileURL,
-		isModalInputOpen,
-		setIsModalInputOpen,
-		handleSubmit,
-		register,
+		modalOpen,
+		setModalOpen,
 	};
 };

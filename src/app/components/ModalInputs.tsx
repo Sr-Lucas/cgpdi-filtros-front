@@ -1,4 +1,4 @@
-import { FieldValues, UseFormRegister } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 type InputField = {
 	label: string;
@@ -13,10 +13,11 @@ type ModalInputsProps = {
 	isOpen: boolean;
 	onSend: any;
 	onClose: () => void;
-	register: UseFormRegister<FieldValues>;
 };
 
-export const ModalInputs = ({ inputFields, onSend, onClose, isOpen, register }: ModalInputsProps) => {
+export const ModalInputs = ({ inputFields, onSend, onClose, isOpen }: ModalInputsProps) => {
+	const { register, handleSubmit } = useForm({});
+
 	return (
 		<div className="modal-input" style={{ display: isOpen ? 'flex' : ' none' }}>
 			<div className="modal-header">
@@ -26,7 +27,7 @@ export const ModalInputs = ({ inputFields, onSend, onClose, isOpen, register }: 
 				</button>
 			</div>
 
-			<form onSubmit={onSend}>
+			<form onSubmit={handleSubmit(onSend)}>
 				{inputFields.map(inputField => (
 					<div key={inputField.id} className="input-field">
 						<label htmlFor={inputField.name}>{inputField.label}</label>
@@ -43,7 +44,7 @@ export const ModalInputs = ({ inputFields, onSend, onClose, isOpen, register }: 
 					<button className="cancel" onClick={onClose}>
 						Cancelar
 					</button>
-					<button className="send" onClick={onSend}>
+					<button className="send" type="submit">
 						Enviar
 					</button>
 				</div>
