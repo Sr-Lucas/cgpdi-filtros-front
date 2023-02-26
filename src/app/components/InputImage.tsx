@@ -14,7 +14,7 @@ export const InputImage = ({ handleInputImage, inputImage }: InputImageParams) =
 	const { mousePos, handleMouseMoveCB, getPixelNC } = useMouse(inputImage, inputImageRef);
 
 	return (
-		<>
+		<div id="input-image-container">
 			<label htmlFor="input-image">Input Image</label>
 			<label htmlFor="input-image">
 				(x: {mousePos.x}, y: {mousePos.y} , NC: {getPixelNC(mousePos.x, mousePos.y)})
@@ -39,6 +39,6 @@ export const InputImage = ({ handleInputImage, inputImage }: InputImageParams) =
 				<input type="file" accept="image/bmp" onChange={e => handleInputImage(e)} />
 				{inputImage ? <></> : <NextImage alt="" src="/images/image-gallery.png" width={20} height={20} />}
 			</div>
-		</>
+		</div>
 	);
 };

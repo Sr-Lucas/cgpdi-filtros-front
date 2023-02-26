@@ -10,6 +10,7 @@ type UseImageFilterProps = {
 };
 
 const filteredURLAtom = atom<string>('');
+const filteredFileAtom = atom<string>('');
 
 type InputField = {
 	label: string;
@@ -25,6 +26,7 @@ type FilterType = {
 	method: (data: HandleParams) => void;
 	inputFields: InputField[];
 	modalId?: number;
+	type: 'image-manipulation' | 'hight-pass' | 'low-pass';
 };
 
 type HandleParams = {
@@ -47,6 +49,7 @@ enum ModalEnum {
 export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 	const [modalOpen, setModalOpen] = useState<number | null>(null);
 	const [filteredFileURL, setFilteredFileURL] = useAtom(filteredURLAtom);
+	const [filteredFile, setFilteredFile] = useAtom(filteredFileAtom);
 
 	const onSubmit = async (filter: IFilter) => {
 		await handleFilter(filter);
@@ -59,8 +62,23 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			data: { url },
 		} = await filter.apply({ filename: fileUploadName });
 
+		await getImageFileReaderResult(url);
+
 		setFilteredFileURL(url);
 		setModalOpen(null);
+	};
+
+	const getImageFileReaderResult = async (url: string) => {
+		fetch(url)
+			.then(response => response.blob())
+			.then(blob => {
+				const fileReader = new FileReader();
+				fileReader.onload = () => {
+					const result = fileReader.result ?? '';
+					setFilteredFile(result as string);
+				};
+				fileReader.readAsDataURL(blob);
+			});
 	};
 
 	const handleNegativeFilter = async () => {
@@ -196,24 +214,28 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			name: 'Negativo',
 			method: handleNegativeFilter,
 			inputFields: [],
+			type: 'low-pass',
 		},
 		{
 			id: 'logarithmic',
 			name: 'Logarítmico',
 			method: handleLogarithmicFilter,
 			inputFields: [],
+			type: 'low-pass',
 		},
 		{
 			id: 'inverselog',
 			name: 'Logarítmico Inverso',
 			method: handleInverseLogFilter,
 			inputFields: [],
+			type: 'low-pass',
 		},
 		{
 			id: 'nthpower',
 			name: 'Filtro da Potência',
 			method: handleNthPowerFilter,
 			modalId: ModalEnum.handleNthPowerFilter,
+			type: 'low-pass',
 			inputFields: [
 				{
 					label: 'Gamma',
@@ -229,6 +251,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			name: 'Filtro da Raiz',
 			method: handlenthRootFilter,
 			modalId: ModalEnum.handleNthRootFilter,
+			type: 'low-pass',
 			inputFields: [
 				{
 					label: 'Gamma',
@@ -242,6 +265,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		{
 			id: 'mirroring-horizontal',
 			name: 'Espelhamento Horizontal',
+			type: 'image-manipulation',
 			method: handleHorizontalMirrorFilter,
 			inputFields: [],
 		},
@@ -249,17 +273,20 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			id: 'mirroring-vertical',
 			name: 'Espelhamento Vertical',
 			method: handleverticalMirrorFilter,
+			type: 'image-manipulation',
 			inputFields: [],
 		},
 		{
 			id: 'rotation-90-clockwise',
 			name: 'Rotação 90º graus sentido horario',
 			method: handlerotation90ClockwiseFilter,
+			type: 'image-manipulation',
 			inputFields: [],
 		},
 		{
 			id: 'rotation-90-anticlockwise',
 			name: 'Rotação 90º AntiHorario',
+			type: 'image-manipulation',
 			method: handlerotation90AnticlockwiseFilter,
 			inputFields: [],
 		},
@@ -267,6 +294,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			id: 'compression',
 			name: 'Compressão de Imagem',
 			method: handleCompression,
+			type: 'image-manipulation',
 			modalId: ModalEnum.handleCompression,
 			inputFields: [
 				{
@@ -290,6 +318,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			name: 'Expansão de Imagem',
 			method: handleExpansion,
 			modalId: ModalEnum.handleExpansion,
+			type: 'image-manipulation',
 			inputFields: [
 				{
 					label: 'A',
@@ -310,6 +339,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		{
 			id: 'max-filter',
 			name: 'Filtro "Máx"',
+			type: 'low-pass',
 			method: handlemaxFilter,
 			inputFields: [],
 		},
@@ -317,17 +347,20 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			id: 'min-filter',
 			name: 'Filtro "Mín"',
 			method: handleminFilter,
+			type: 'low-pass',
 			inputFields: [],
 		},
 		{
 			id: 'mode-filter',
 			name: 'Filtro da Moda',
 			method: handlemodaFilter,
+			type: 'low-pass',
 			inputFields: [],
 		},
 		{
 			id: 'pseudo-median-filter',
 			name: 'PseudoMediana',
+			type: 'low-pass',
 			method: handlepseudoMedianaFilter,
 			inputFields: [],
 		},
@@ -336,6 +369,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			name: 'Nearest Neighboor Resampling',
 			method: handlennrAmpliation,
 			modalId: ModalEnum.handlennrAmpliation,
+			type: 'image-manipulation',
 			inputFields: [
 				{
 					id: 'scale_factor',
@@ -349,6 +383,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		{
 			id: 'bilinear',
 			name: 'Bilinear Interpolation Resampling',
+			type: 'image-manipulation',
 			method: handlebirAmpliation,
 			modalId: ModalEnum.handlebirAmpliation,
 			inputFields: [
@@ -366,6 +401,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			name: 'K Vizinhos',
 			method: handlekNearestNeighbour,
 			modalId: ModalEnum.handlekNearestNeighbour,
+			type: 'low-pass',
 			inputFields: [
 				{
 					label: 'K',
@@ -380,12 +416,14 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			id: 'histogram',
 			name: 'Histograma',
 			method: handlemakeHistogram,
+			type: 'low-pass',
 			inputFields: [],
 		},
 		{
 			id: 'histogram-equalization',
 			name: 'Equalização de imagem',
 			method: handleequalizeImage,
+			type: 'image-manipulation',
 			inputFields: [],
 		},
 		{
@@ -393,6 +431,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			name: 'Soma de imagens',
 			method: handlesumImages,
 			modalId: ModalEnum.handleSumImage,
+			type: 'image-manipulation',
 			inputFields: [
 				{
 					id: 'filename2',
@@ -407,6 +446,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			id: 'laplanian',
 			name: 'Filtro Laplaciano',
 			method: handlelaplaciano,
+			type: 'hight-pass',
 			inputFields: [],
 		},
 		{
@@ -414,6 +454,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			name: 'Filtro HighBoost',
 			method: handlehightboost,
 			modalId: ModalEnum.handleHightboost,
+			type: 'hight-pass',
 			inputFields: [
 				{
 					label: 'Percentual %',
@@ -428,12 +469,14 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			id: 'prewitt',
 			name: 'Filtro Prewitt',
 			method: handleprewitt,
+			type: 'hight-pass',
 			inputFields: [],
 		},
 		{
 			id: 'sobel',
 			name: 'Filtro Sobel',
 			method: handlesobel,
+			type: 'hight-pass',
 			inputFields: [],
 		},
 		{
@@ -441,6 +484,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			name: 'Simular reducao de paleta de NC',
 			method: handleNcColors,
 			modalId: ModalEnum.handleNcColors,
+			type: 'image-manipulation',
 			inputFields: [
 				{
 					label: 'N',
@@ -458,5 +502,6 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 		filteredFileURL,
 		modalOpen,
 		setModalOpen,
+		filteredFile,
 	};
 };
