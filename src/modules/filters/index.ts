@@ -25,6 +25,7 @@ import { LaplacianoFilter } from './laplaciano';
 import { HightBoostFilter } from './hightboost';
 import { PrewittFilter } from './prewitt';
 import { SobelFilter } from './sobel';
+import { SimulateGreyLevelReductionFilter } from './simulate-gray-level-reduction';
 
 
 export const filters = {
@@ -52,6 +53,6 @@ export const filters = {
   laplaciano: new LaplacianoFilter(api),
   HightBoostFilter: new HightBoostFilter(api),
   PrewittFilter: new PrewittFilter(api),
-  SobelFilter: new SobelFilter(api)
-  
+  SobelFilter: new SobelFilter(api),
+  simulateGreyLevelReduction: new SimulateGreyLevelReductionFilter(api),
 };

@@ -29,13 +29,14 @@ export const ModalInputs = ({ inputFields, onSend, onClose, isOpen }: ModalInput
 
 			<form onSubmit={handleSubmit(onSend)}>
 				{inputFields.map(inputField => (
-					<div key={inputField.id} className="input-field">
+					<div key={inputField.id + '-input'} className="input-field">
 						<label htmlFor={inputField.name}>{inputField.label}</label>
 						<input
 							{...register(inputField.id, { required: inputField.required })}
 							type={inputField.type}
 							id={inputField.id}
 							name={inputField.name}
+							step={inputField.type === 'number' ? '0.01' : undefined}
 						/>
 					</div>
 				))}

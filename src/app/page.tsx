@@ -19,21 +19,21 @@ export default function Home() {
 				<h1>Filtros</h1>
 				<div id="filters">
 					{filters.map(filter => (
-						<>
+						<div key={filter.id + '-button'}>
 							<FilterButton
-								key={filter.name}
 								filterName={filter.name}
 								handleFilter={filter.inputFields.length > 0 ? () => setModalOpen(filter.modalId ?? null) : filter.method}
 							/>
 							{filter.inputFields.length > 0 && (
 								<ModalInputs
+									key={filter.id + '-modal'}
 									inputFields={filter.inputFields}
 									isOpen={modalOpen === filter.modalId}
 									onClose={() => setModalOpen(null)}
-									onSend={filter.method}
+									onSend={filter.method ?? (() => console.log('vazio'))}
 								/>
 							)}
-						</>
+						</div>
 					))}
 				</div>
 
