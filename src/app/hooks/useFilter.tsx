@@ -416,7 +416,7 @@ export const useImageFilter = ({ fileUploadName }: UseImageFilterProps) => {
 			id: 'histogram',
 			name: 'Histograma',
 			method: handlemakeHistogram,
-			type: 'low-pass',
+			type: 'image-manipulation',
 			inputFields: [],
 		},
 		{

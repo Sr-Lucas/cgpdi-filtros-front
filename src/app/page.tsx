@@ -104,7 +104,7 @@ export default function Home() {
 			</div>
 
 			<div id="footer">
-				<p>Desenvolvido por: Lucas Santos & Ingrid Felicissima</p>
+				<p>Desenvolvido por: Lucas Santos & Yngrid Felicissima</p>
 			</div>
 		</main>
 	);
